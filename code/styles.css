@@ -1,0 +1,27 @@
+.book-table {
+    border: 1px solid black;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: 1fr 1fr ;
+}
+
+.book-form-container {
+    display: flex;
+    justify-content: center;
+}
+
+.book-form {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    padding: 1rem;
+    gap: 10px;
+    border: 1px solid gray;
+    border-radius: 1rem;
+}
+
+.form-item {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+}
