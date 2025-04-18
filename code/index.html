@@ -23,12 +23,12 @@
                 
                 <div class="form-item">
                     <label for="pages">Number of pages:</label>
-                    <input type="text" name="pages" id="pages" placeholder="Number of pages" required>
+                    <input type="number" name="pages" id="pages" placeholder="Number of pages" min="0" value="0" required>
                 </div>
                 
                 <div class="form-item">
                     <label for="read-status">Have you read this book?</label>
-                    <input type="checkbox" name="read-status" id="read-status" required>
+                    <input type="checkbox" name="read-status" id="read-status">
                 </div>
                 
                 <button class="submit">Submit</button>
@@ -43,6 +43,7 @@
                     <th>Author</th>
                     <th>Pages</th>
                     <th>Read it?</th>
+                    <th>Delete</th>
                 </thead>
                 <tbody class="BT-body">
             
