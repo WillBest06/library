@@ -1,10 +1,27 @@
-let myLibrary = [];
 const submitBtn = document.querySelector(".submit");
 const bookTable = document.querySelector(".book-table");
 const titleInput = document.querySelector("#title");
 const authorInput = document.querySelector("#author");
 const pagesInput = document.querySelector("#pages");
 const readInput = document.querySelector("#read-status");
+
+class Library {
+  constructor() {
+    this.books = [];
+  }
+
+  addBook(book) {
+    this.books.push(book);
+  }
+
+  updateBookReadStatus(book) {
+    book.readStatus = !book.readStatus;
+  }
+
+  deleteBook(bookToBeDeleted) {
+    this.books = this.books.filter((book) => book.id != bookToBeDeleted.id);
+  }
+}
 
 class Book {
   constructor(title, author, pages, status) {
@@ -19,72 +36,71 @@ class Book {
   }
 }
 
-function clearTable() {
-  const tableBody = document.querySelector(".BT-body");
-  while (tableBody.firstChild) {
-    tableBody.removeChild(tableBody.firstChild);
+class UIrenderer {
+  constructor() {
+    this.tableBody = document.querySelector(".BT-body");
   }
-}
 
-function addBookToTable(book) {
-  const tableBody = document.querySelector(".BT-body");
-  const newRow = document.createElement("tr");
-  tableBody.appendChild(newRow);
-
-  for (let property in book) {
-    const newCell = document.createElement("td");
-
-    if (property === "status") {
-      const readCheckBox = document.createElement("input");
-      readCheckBox.addEventListener("click", () => {
-        book.readStatus = readCheckBox.checked;
-        colourChange(readCheckBox.parentElement.parentElement);
-        tableUpdate();
-      });
-      readCheckBox.type = "checkbox";
-
-      if (book[property] === true) {
-        readCheckBox.checked = true;
-        newRow.classList.add("read");
-      }
-      readCheckBox.classList.add("readCHK");
-      newCell.appendChild(readCheckBox);
-    } else {
-      newCell.textContent = book[property];
+  clearTable() {
+    while (this.tableBody.firstChild) {
+      this.tableBody.removeChild(this.tableBody.firstChild);
     }
-
-    newRow.appendChild(newCell);
   }
 
-  const deleteCell = document.createElement("td");
-  const deleteBTN = document.createElement("button");
-  deleteBTN.textContent = "delete";
-  deleteBTN.classList.add("deleteBTN");
-  deleteBTN.addEventListener("click", () => deleteBook(book, newRow));
+  renderBook(book) {
+    const newRow = document.createElement("tr");
+    this.tableBody.appendChild(newRow);
 
-  deleteCell.appendChild(deleteBTN);
-  newRow.appendChild(deleteCell);
+    ["title", "author", "pages"].forEach((prop) => {
+      const newCell = document.createElement("td");
+      newCell.textContent = book[prop];
+      newRow.appendChild(newCell);
+    });
+
+    const readStatusCell = document.createElement("td");
+    const readStatusInput = document.createElement("input");
+    readStatusInput.type = "checkbox";
+    readStatusInput.checked = book.status;
+    readStatusInput.classList.add("readCHK");
+    if (book.status == true) newRow.classList.add("read");
+    readStatusInput.addEventListener("click", () =>
+      handleReadStatusUpdate(book, newRow)
+    );
+    readStatusCell.appendChild(readStatusInput);
+    newRow.appendChild(readStatusCell);
+
+    const deleteCell = document.createElement("td");
+    const deleteBTN = document.createElement("button");
+    deleteBTN.textContent = "delete";
+    deleteBTN.classList.add("deleteBTN");
+    deleteBTN.addEventListener("click", () => handleDeleteBook(book, newRow));
+
+    deleteCell.appendChild(deleteBTN);
+    newRow.appendChild(deleteCell);
+  }
+
+  clearForm() {
+    titleInput.value = null;
+    authorInput.value = null;
+    pagesInput.value = null;
+    readInput.checked = false;
+  }
+
+  deleteBookRow(row) {
+    row.remove();
+  }
+
+  rowColourChange(row) {
+    row.classList.toggle("read");
+  }
 }
 
-function clearForm() {
-  titleInput.value = null;
-  authorInput.value = null;
-  pagesInput.value = null;
-  readInput.checked = false;
-}
-
-function deleteBook(bookToBeDeleted, row) {
-  myLibrary = myLibrary.filter((book) => book.id != bookToBeDeleted.id);
-  row.remove();
-}
-
-function colourChange(row) {
-  row.classList.toggle("read");
-}
+const myLibrary = new Library();
+const myUIrenderer = new UIrenderer();
 
 document.addEventListener("submit", (e) => {
   e.preventDefault();
-  myLibrary.push(
+  myLibrary.addBook(
     new Book(
       titleInput.value,
       authorInput.value,
@@ -92,7 +108,17 @@ document.addEventListener("submit", (e) => {
       readInput.checked
     )
   );
-  clearTable();
-  myLibrary.forEach((book) => addBookToTable(book));
-  clearForm();
+  myUIrenderer.clearTable();
+  myLibrary.books.forEach((book) => myUIrenderer.renderBook(book));
+  myUIrenderer.clearForm();
 });
+
+function handleDeleteBook(book, row) {
+  myUIrenderer.deleteBookRow(row);
+  myLibrary.deleteBook(book);
+}
+
+function handleReadStatusUpdate(book, row) {
+  myUIrenderer.rowColourChange(row);
+  myLibrary.updateBookReadStatus(book);
+}
